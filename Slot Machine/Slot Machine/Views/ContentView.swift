@@ -24,6 +24,8 @@ struct ContentView: View {
     @State private var betAmount: Int = 10
     @State private var reels: Array = [0, 1, 2]
     @State private var showingInfoView = false
+    @State private var isActiveBet10 = true
+    @State private var isActiveBet20 = false
     
     // MARK: - FUNCTIONS
     
@@ -55,15 +57,27 @@ struct ContentView: View {
     }
     
     private func playerWins() {
-        coins += betAmount * 10
+        self.coins += self.betAmount * 10
     }
     
     private func newHighScore() {
-        highScore = coins
+        self.highScore = self.coins
     }
     
     private func playerLoses() {
-        coins -= betAmount
+        self.coins -= self.betAmount
+    }
+    
+    private func activateBet20() {
+        self.betAmount = 20
+        self.isActiveBet20 = true
+        self.isActiveBet10 = false
+    }
+    
+    private func activateBet10() {
+        betAmount = 10
+        self.isActiveBet10 = true
+        self.isActiveBet20 = false
     }
     
     // GAME IS OVER
@@ -185,11 +199,13 @@ struct ContentView: View {
                     
                     HStack(alignment: .center, spacing: 10) {
                         Button {
-                            print("Bet 20 coins")
+                            self.activateBet20()
                         } label: {
                             Text("20")
                                 .fontWeight(.heavy)
-                                .foregroundColor(.white)
+                                .foregroundColor(
+                                    self.isActiveBet20 ? Color("ColorYellow") : .white
+                                )
                                 .modifier(BetNumberModifier())
                         }
                         .modifier(BetCapsuleModifier())
@@ -197,7 +213,7 @@ struct ContentView: View {
                         
                         Image("gfx-casino-chips")
                             .resizable()
-                            .opacity(0)
+                            .opacity(self.isActiveBet20 ? 1 : 0)
                             .scaledToFit()
                             .modifier(CasinoChipsModifier())
                     }
@@ -207,16 +223,16 @@ struct ContentView: View {
                     HStack(alignment: .center, spacing: 10) {
                         Image("gfx-casino-chips")
                             .resizable()
-                            .opacity(1)
+                            .opacity(self.isActiveBet10 ? 1 : 0)
                             .scaledToFit()
                             .modifier(CasinoChipsModifier())
                         
                         Button {
-                            print("Bet 10 coins")
+                            self.activateBet10()
                         } label: {
                             Text("10")
                                 .fontWeight(.heavy)
-                                .foregroundColor(.yellow)
+                                .foregroundColor(self.isActiveBet10 ? Color("ColorYellow") : .white)
                                 .modifier(BetNumberModifier())
                         }
                         .modifier(BetCapsuleModifier())
