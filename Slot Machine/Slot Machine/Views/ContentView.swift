@@ -7,15 +7,17 @@
 
 import SwiftUI
 
-// MARK: - PROPERTIES
-
 struct ContentView: View {
+    // MARK: - PROPERTIES
+    
+    @State private var showingInfoView = false
     
     // MARK: - BODY
     
     var body: some View {
         ZStack {
             // MARK: - BACKGROUND
+            
             LinearGradient(
                 gradient: Gradient(
                     colors: [
@@ -29,6 +31,7 @@ struct ContentView: View {
             .edgesIgnoringSafeArea(.all)
             
             // MARK: - INTERFACE
+            
             VStack(alignment: .center, spacing: 5) {
                 // MARK: - HEADER
                 
@@ -116,6 +119,49 @@ struct ContentView: View {
                 // MARK: - FOOTER
                 
                 Spacer()
+                
+                HStack {
+                    // MARK: - BET 20
+                    
+                    HStack(alignment: .center, spacing: 10) {
+                        Button {
+                            print("Bet 20 coins")
+                        } label: {
+                            Text("20")
+                                .fontWeight(.heavy)
+                                .foregroundColor(.white)
+                                .modifier(BetNumberModifier())
+                        }
+                        .modifier(BetCapsuleModifier())
+                        
+                        
+                        Image("gfx-casino-chips")
+                            .resizable()
+                            .opacity(0)
+                            .scaledToFit()
+                            .modifier(CasinoChipsModifier())
+                    }
+                    
+                    // MARK: - BET 10
+                    
+                    HStack(alignment: .center, spacing: 10) {
+                        Image("gfx-casino-chips")
+                            .resizable()
+                            .opacity(1)
+                            .scaledToFit()
+                            .modifier(CasinoChipsModifier())
+                        
+                        Button {
+                            print("Bet 10 coins")
+                        } label: {
+                            Text("10")
+                                .fontWeight(.heavy)
+                                .foregroundColor(.yellow)
+                                .modifier(BetNumberModifier())
+                        }
+                        .modifier(BetCapsuleModifier())
+                    }
+                }
             }
             // MARK: - BUTTONS
             
@@ -126,7 +172,6 @@ struct ContentView: View {
                 })  {
                     Image(systemName: "arrow.2.circlepath.circle")
                 }
-                .padding(.horizontal, -15)
                 .modifier(ButtonModifier()),
                 alignment: .topLeading
             )
@@ -134,10 +179,10 @@ struct ContentView: View {
                 // INFO
                 Button(action: {
                     print("Info View")
+                    self.showingInfoView.toggle()
                 })  {
                     Image(systemName: "info.circle")
                 }
-                .padding(.horizontal, -15)
                 .modifier(ButtonModifier()),
                 alignment: .topTrailing
             )
@@ -146,6 +191,9 @@ struct ContentView: View {
             
             // MARK: - POP UP
         } //: ZSTACK
+        .sheet(isPresented: $showingInfoView) {
+            InfoView()
+        }
     }
 }
 
