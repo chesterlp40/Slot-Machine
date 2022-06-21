@@ -19,6 +19,10 @@
 		86EFCAAF28615B6400FC4A7F /* win.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 86EFCAA728615B6400FC4A7F /* win.mp3 */; };
 		86EFCAB028615B6400FC4A7F /* casino-chips.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 86EFCAA828615B6400FC4A7F /* casino-chips.mp3 */; };
 		86EFCAB128615B6400FC4A7F /* high-score.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 86EFCAA928615B6400FC4A7F /* high-score.mp3 */; };
+		86EFCAB8286163B900FC4A7F /* LogoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86EFCAB7286163B900FC4A7F /* LogoView.swift */; };
+		86EFCABA2861640900FC4A7F /* Modifiers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86EFCAB92861640900FC4A7F /* Modifiers.swift */; };
+		86EFCABC28616A7E00FC4A7F /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86EFCABB28616A7E00FC4A7F /* Extensions.swift */; };
+		86EFCABE28616EF600FC4A7F /* ReelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86EFCABD28616EF600FC4A7F /* ReelView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -36,6 +40,10 @@
 		86EFCAA828615B6400FC4A7F /* casino-chips.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "casino-chips.mp3"; sourceTree = "<group>"; };
 		86EFCAA928615B6400FC4A7F /* high-score.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "high-score.mp3"; sourceTree = "<group>"; };
 		86EFCAB628615CF600FC4A7F /* Slot-Machine-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "Slot-Machine-Info.plist"; sourceTree = SOURCE_ROOT; };
+		86EFCAB7286163B900FC4A7F /* LogoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogoView.swift; sourceTree = "<group>"; };
+		86EFCAB92861640900FC4A7F /* Modifiers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Modifiers.swift; sourceTree = "<group>"; };
+		86EFCABB28616A7E00FC4A7F /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
+		86EFCABD28616EF600FC4A7F /* ReelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReelView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -106,6 +114,8 @@
 			isa = PBXGroup;
 			children = (
 				86086F47285EF8100001ED39 /* ContentView.swift */,
+				86EFCAB7286163B900FC4A7F /* LogoView.swift */,
+				86EFCABD28616EF600FC4A7F /* ReelView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -121,6 +131,8 @@
 		86EFCAB528615BDD00FC4A7F /* Helpers */ = {
 			isa = PBXGroup;
 			children = (
+				86EFCAB92861640900FC4A7F /* Modifiers.swift */,
+				86EFCABB28616A7E00FC4A7F /* Extensions.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -203,7 +215,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				86EFCABE28616EF600FC4A7F /* ReelView.swift in Sources */,
+				86EFCABC28616A7E00FC4A7F /* Extensions.swift in Sources */,
+				86EFCABA2861640900FC4A7F /* Modifiers.swift in Sources */,
 				86086F48285EF8100001ED39 /* ContentView.swift in Sources */,
+				86EFCAB8286163B900FC4A7F /* LogoView.swift in Sources */,
 				86086F46285EF8100001ED39 /* Slot_MachineApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
