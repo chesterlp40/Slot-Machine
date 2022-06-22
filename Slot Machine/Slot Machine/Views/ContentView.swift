@@ -10,6 +10,7 @@ import SwiftUI
 struct ContentView: View {
     // MARK: - PROPERTIES
     
+    let haptics = UINotificationFeedbackGenerator()
     let symbols = [
         "gfx-bell",
         "gfx-cherry",
@@ -19,13 +20,18 @@ struct ContentView: View {
         "gfx-strawberry"
     ]
     
-    @State private var highScore: Int = 0
+    @State private var highScore: Int = UserDefaults.standard.integer(
+        forKey: "HighScore"
+    )
     @State private var coins: Int = 100
     @State private var betAmount: Int = 10
     @State private var reels: Array = [0, 1, 2]
     @State private var showingInfoView = false
     @State private var isActiveBet10 = true
     @State private var isActiveBet20 = false
+    @State private var showingModal = false
+    @State private var animateSymbol = false
+    @State private var animatingModal = false
     
     // MARK: - FUNCTIONS
     
@@ -34,6 +40,11 @@ struct ContentView: View {
         reels = reels.map({ _ in
             Int.random(in: 0...symbols.count - 1)
         })
+        playSound(
+            sound: "spin",
+            type: "mp3"
+        )
+        haptics.notificationOccurred(.success)
     }
     
     // CHECK THE WINNING
@@ -49,6 +60,11 @@ struct ContentView: View {
             // NEW HIGHSCORE
             if coins > highScore {
                 self.newHighScore()
+            } else {
+                playSound(
+                    sound: "win",
+                    type: "mp3"
+                )
             }
         } else {
             // PLAYER LOSES
@@ -62,6 +78,14 @@ struct ContentView: View {
     
     private func newHighScore() {
         self.highScore = self.coins
+        UserDefaults.standard.set(
+            self.highScore,
+            forKey: "HighScore"
+        )
+        playSound(
+            sound: "high-score",
+            type: "mp3"
+        )
     }
     
     private func playerLoses() {
@@ -72,15 +96,49 @@ struct ContentView: View {
         self.betAmount = 20
         self.isActiveBet20 = true
         self.isActiveBet10 = false
+        playSound(
+            sound: "casino-chips",
+            type: "mp3"
+        )
+        haptics.notificationOccurred(.success)
     }
     
     private func activateBet10() {
         betAmount = 10
         self.isActiveBet10 = true
         self.isActiveBet20 = false
+        playSound(
+            sound: "casino-chips",
+            type: "mp3"
+        )
+        haptics.notificationOccurred(.success)
     }
     
     // GAME IS OVER
+    private func isGameOver() {
+        if self.coins <= 0 {
+            // SHOW MODAL WINDOW
+            self.showingModal = true
+            playSound(
+                sound: "game-over",
+                type: "mp3"
+            )
+        }
+    }
+    
+    private func resetGame() {
+        UserDefaults.standard.set(
+            0,
+            forKey: "HighScore"
+        )
+        self.highScore = 0
+        self.coins = 100
+        self.activateBet10()
+        playSound(
+            sound: "chimeup",
+            type: "mp3"
+        )
+    }
     
     // MARK: - BODY
     
@@ -146,6 +204,24 @@ struct ContentView: View {
                         Image(symbols[reels[0]])
                             .resizable()
                             .modifier(ImageModifier())
+                            .opacity(self.animateSymbol ? 1 : 0)
+                            .offset(
+                                y: self.animateSymbol ? 0 : -50
+                            )
+                            .animation(
+                                .easeOut(
+                                    duration: Double.random(
+                                        in: 0.5...0.7
+                                    )
+                                )
+                            )
+                            .onAppear {
+                                self.animateSymbol.toggle()
+                                playSound(
+                                    sound: "riseup",
+                                    type: "mp3"
+                                )
+                            }
                     }
                     
                     HStack(alignment: .center, spacing: 0) {
@@ -156,6 +232,20 @@ struct ContentView: View {
                             Image(symbols[reels[1]])
                                 .resizable()
                                 .modifier(ImageModifier())
+                                .opacity(self.animateSymbol ? 1 : 0)
+                                .offset(
+                                    y: self.animateSymbol ? 0 : -50
+                                )
+                                .animation(
+                                    .easeOut(
+                                        duration: Double.random(
+                                            in: 0.5...0.7
+                                        )
+                                    )
+                                )
+                                .onAppear {
+                                    self.animateSymbol.toggle()
+                                }
                         }
                         
                         Spacer()
@@ -167,6 +257,20 @@ struct ContentView: View {
                             Image(symbols[reels[2]])
                                 .resizable()
                                 .modifier(ImageModifier())
+                                .opacity(self.animateSymbol ? 1 : 0)
+                                .offset(
+                                    y: self.animateSymbol ? 0 : -50
+                                )
+                                .animation(
+                                    .easeOut(
+                                        duration: Double.random(
+                                            in: 0.5...0.7
+                                        )
+                                    )
+                                )
+                                .onAppear {
+                                    self.animateSymbol.toggle()
+                                }
                         }
                     }
                     .frame(maxWidth: 500)
@@ -174,11 +278,24 @@ struct ContentView: View {
                     // MARK: - SPIN BUTTON
                     
                     Button {
-                        // SPIN THE REELS
+                        // 1 - SET THE DEFAULT STATE: NO ANIMATION
+                        withAnimation {
+                            self.animateSymbol = false
+                        }
+                        
+                        // 2 - SPIN THE REELS WITH CHANGING THE SYMBOLS
                         self.spinReels()
                         
-                        // CHECK THE WINNING
+                        // 3 - TRIGGER THE ANIMATION AFTER CHANGING THE SYMBOLS
+                        withAnimation {
+                            self.animateSymbol = true
+                        }
+                        
+                        // 4 - CHECK THE WINNING
                         self.checkWinning()
+                        
+                        // 5 - GAME IS OVER
+                        self.isGameOver()
                     } label: {
                         Image("gfx-spin")
                             .renderingMode(.original)
@@ -213,16 +330,24 @@ struct ContentView: View {
                         
                         Image("gfx-casino-chips")
                             .resizable()
+                            .offset(
+                                x: self.isActiveBet20 ? 0 : 20
+                            )
                             .opacity(self.isActiveBet20 ? 1 : 0)
                             .scaledToFit()
                             .modifier(CasinoChipsModifier())
                     }
+                    
+                    Spacer()
                     
                     // MARK: - BET 10
                     
                     HStack(alignment: .center, spacing: 10) {
                         Image("gfx-casino-chips")
                             .resizable()
+                            .offset(
+                                x: self.isActiveBet10 ? 0 : -20
+                            )
                             .opacity(self.isActiveBet10 ? 1 : 0)
                             .scaledToFit()
                             .modifier(CasinoChipsModifier())
@@ -244,7 +369,7 @@ struct ContentView: View {
             .overlay(
                 // RESET
                 Button(action: {
-                    print("Reset Game")
+                    self.resetGame()
                 })  {
                     Image(systemName: "arrow.2.circlepath.circle")
                 }
@@ -264,8 +389,127 @@ struct ContentView: View {
             )
             .padding()
             .frame(maxWidth: 720)
+            .blur(
+                radius: $showingModal.wrappedValue ? 5 : 0,
+                opaque: false
+            )
             
             // MARK: - POP UP
+            
+            if $showingModal.wrappedValue {
+                ZStack {
+                    Color("ColorTransparentBlack")
+                        .edgesIgnoringSafeArea(.all)
+                    
+                    // MODAL
+                    VStack (spacing: 0) {
+                        // TITLE
+                        Text("GAME OVER")
+                            .font(
+                                .system(
+                                    .title,
+                                    design: .rounded
+                                )
+                            )
+                            .fontWeight(.heavy)
+                            .padding()
+                            .frame(
+                                minWidth: 0,
+                                maxWidth: .infinity
+                            )
+                            .background(Color("ColorPink"))
+                            .foregroundColor(.white)
+                        
+                        Spacer()
+                        
+                        // MESSAGE
+                        VStack(alignment: .center, spacing: 16) {
+                            Image("gfx-seven-reel")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(maxHeight: 72)
+                            
+                            Text("Bad luck! you lost all of the coins.\nLet's play again!")
+                                .font(
+                                    .system(
+                                        .body,
+                                        design: .rounded
+                                    )
+                                )
+                                .lineLimit(2)
+                                .multilineTextAlignment(.center)
+                                .foregroundColor(.gray)
+                                .layoutPriority(1)
+                            
+                            Button {
+                                self.showingModal = false
+                                self.animatingModal = false
+                                self.activateBet10()
+                                self.coins = 100
+                            } label: {
+                                Text("New Game".uppercased())
+                                    .font(
+                                        .system(
+                                            .body,
+                                            design: .rounded
+                                        )
+                                    )
+                                    .fontWeight(.semibold)
+                                    .tint(Color("ColorPink"))
+                                    .padding(.horizontal, 12)
+                                    .padding(.vertical, 8)
+                                    .frame(minWidth: 128)
+                                    .background(
+                                        Capsule()
+                                            .strokeBorder(
+                                                lineWidth: 1.75,
+                                                antialiased: true
+                                            )
+                                            .foregroundColor(
+                                                Color("ColorPink")
+                                            )
+                                    )
+                            }
+
+                        }
+                        
+                        Spacer()
+                    }
+                    .frame(
+                        minWidth: 280,
+                        idealWidth: 280,
+                        maxWidth: 320,
+                        minHeight: 260,
+                        idealHeight: 280,
+                        maxHeight: 320,
+                        alignment: .center
+                    )
+                    .background(.white)
+                    .cornerRadius(20)
+                    .shadow(
+                        color: Color("ColorTransparentBlack"),
+                        radius: 6,
+                        x: 0,
+                        y: 8
+                    )
+                    .opacity(
+                        $animatingModal.wrappedValue ? 1 : 0
+                    )
+                    .offset(
+                        y: $animatingModal.wrappedValue ? 0 : -100
+                    )
+                    .animation(
+                        Animation.spring(
+                            response: 0.6,
+                            dampingFraction: 1.0,
+                            blendDuration: 1.0
+                        )
+                    )
+                    .onAppear {
+                        self.animatingModal = true
+                    }
+                }
+            }
         } //: ZSTACK
         .sheet(isPresented: $showingInfoView) {
             InfoView()
